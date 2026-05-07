@@ -260,29 +260,21 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, push, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAElPv2M7vQCFJDM2WcedqStUPWOQLM5qs",
-  authDomain: "hacking-code-7cc15.firebaseapp.com",
-  databaseURL: "https://hacking-code-7cc15-default-rtdb.firebaseio.com",
-  projectId: "hacking-code-7cc15",
-  storageBucket: "hacking-code-7cc15.firebasestorage.app",
-  messagingSenderId: "977452112251",
-  appId: "1:977452112251:web:cb5a436e5de0a605fbc5de"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+        // FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyAElPv2M7vQCFJDM2WcedqStUPWOQLM5qs",
+            authDomain: "hacking-code-7cc15.firebaseapp.com",
+            databaseURL: "https://hacking-code-7cc15-default-rtdb.firebaseio.com",
+            projectId: "hacking-code-7cc15",
+            storageBucket: "hacking-code-7cc15.firebasestorage.app",
+            messagingSenderId: "977452112251",
+            appId: "1:977452112251:web:cb5a436e5de0a605fbc5de"
+        };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const filesRef = ref(db, 'files');
-        const CREDENTIALS = { id: "naitikjain240725@gmail.com", pass: "jain0099" };
+        const CREDENTIALS = { id: "naitikjain240725@gmail.com", pass: "jain6799" };
 
         // STATE
         let files = [];
@@ -387,7 +379,7 @@ const app = initializeApp(firebaseConfig);
             }
         };
 
-        // --- 4. MOVE FUNCTIONALITY (NEW) ---
+        // --- 4. MOVE FUNCTIONALITY ---
         window.openMoveModal = function() {
             if(!state.selectedId) return;
             const fileToMove = files.find(f => f.id === state.selectedId);
@@ -417,7 +409,7 @@ const app = initializeApp(firebaseConfig);
                 listContainer.appendChild(el);
             });
 
-            state.targetMoveFolder = null; // Default null (root) is handled by active class
+            state.targetMoveFolder = null;
             document.getElementById('modal-overlay').style.display = 'flex';
         };
 
@@ -476,7 +468,7 @@ const app = initializeApp(firebaseConfig);
             state.openNoteId = null;
         };
 
-        // --- 6. AUTO SAVE (NEW) ---
+        // --- 6. AUTO SAVE ---
         const autoSaveCheckbox = document.getElementById('autosave-toggle');
         const editor = document.getElementById('note-editor');
 
@@ -488,19 +480,18 @@ const app = initializeApp(firebaseConfig);
         editor.addEventListener('input', () => {
             if(state.role === 'host' && isAutoSaveOn) {
                 clearTimeout(autoSaveTimer);
-                autoSaveTimer = setTimeout(() => saveNoteData(false), 2000); // Save after 2 sec of no typing
+                autoSaveTimer = setTimeout(() => saveNoteData(false), 2000);
             }
         });
 
-        // --- 7. FORMATTING & TOOL COLORS & SHORTCUTS (NEW) ---
+        // --- 7. FORMATTING & TOOL COLORS & SHORTCUTS ---
         
         window.formatDoc = function(cmd) {
             document.execCommand(cmd, false, null);
             editor.focus();
-            checkToolbarStatus(); // Update colors immediately
+            checkToolbarStatus();
         };
 
-        // Listen for caret movement to update tool colors
         document.addEventListener('selectionchange', () => {
             if(state.openNoteId && state.role === 'host') checkToolbarStatus();
         });
@@ -515,14 +506,12 @@ const app = initializeApp(firebaseConfig);
                 const btnItalic = document.getElementById('tool-italic');
                 const btnUnder = document.getElementById('tool-underline');
 
-                // Toggle class active-tool based on state
                 if(bold) btnBold.classList.add('active-tool'); else btnBold.classList.remove('active-tool');
                 if(italic) btnItalic.classList.add('active-tool'); else btnItalic.classList.remove('active-tool');
                 if(underline) btnUnder.classList.add('active-tool'); else btnUnder.classList.remove('active-tool');
             } catch(e) {}
         }
 
-        // Keyboard Shortcuts Override
         editor.addEventListener('keydown', (e) => {
             if(e.ctrlKey) {
                 const key = e.key.toLowerCase();
@@ -532,17 +521,13 @@ const app = initializeApp(firebaseConfig);
             }
         });
 
-        // Search in Editor (Simple Highlight)
         window.searchTextInEditor = function() {
             const txt = document.getElementById('editor-search-box').value;
             if(!txt) return;
-            // Native browser Find (Most reliable)
             if (window.find && window.getSelection) {
                 document.designMode = "on";
                 const sel = window.getSelection();
                 sel.collapse(document.body, 0);
-                
-                // Chrome/Edge/Firefox supports window.find
                 if(!window.find(txt)) {
                     showToast("Text not found");
                 }
@@ -550,28 +535,22 @@ const app = initializeApp(firebaseConfig);
             }
         };
 
-        // --- 8. FILE SEARCH (NEW) ---
+        // --- 8. FILE SEARCH ---
         window.filterFiles = function() {
             const term = document.getElementById('file-search').value.toLowerCase();
             const grid = document.getElementById('file-grid');
             grid.innerHTML = '';
             
-            // Search Mode: Ignore folders, scan everything
             let list = [];
             
             if(term.length > 0) {
-                // Global Search
                 document.getElementById('breadcrumb-path').textContent = "Search Results: " + term;
-                document.getElementById('btn-up').disabled = false; // allows clearing search implicitly by going up or reset
-                
+                document.getElementById('btn-up').disabled = false;
                 list = files.filter(f => f.name.toLowerCase().includes(term));
             } else {
-                // Normal Mode (Folder view)
-                // Restore logic
                 const curName = state.currentFolderId ? (files.find(f=>f.id===state.currentFolderId)?.name || 'Home') : 'Home';
                 document.getElementById('breadcrumb-path').textContent = curName;
                 document.getElementById('btn-up').disabled = !state.currentFolderId;
-                
                 list = files.filter(f => {
                     if(state.currentFolderId === null) return !f.parent;
                     return f.parent === state.currentFolderId;
@@ -591,7 +570,7 @@ const app = initializeApp(firebaseConfig);
                 el.ondblclick = () => {
                     if(f.type === 'folder') {
                         state.currentFolderId = f.id;
-                        document.getElementById('file-search').value = ''; // Reset search on enter folder
+                        document.getElementById('file-search').value = '';
                         renderFiles();
                     } else {
                         openNote(f.id);
@@ -601,7 +580,7 @@ const app = initializeApp(firebaseConfig);
             });
         };
 
-        function renderFiles() { window.filterFiles(); } // filterFiles now handles default render too
+        function renderFiles() { window.filterFiles(); }
         
         function updateButtons() {
             if(state.role==='host') {
