@@ -56,7 +56,14 @@
         header { background: var(--secondary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         
         .toolbar { padding: 10px 20px; background: white; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .breadcrumb { font-weight: bold; color: var(--secondary); font-size: 1.1rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+
+        /* BREADCRUMB - Full Path */
+        .breadcrumb-nav { font-weight: bold; color: var(--secondary); font-size: 1rem; flex: 1; display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+        .breadcrumb-nav .bc-part { cursor: pointer; color: var(--primary); text-decoration: underline; padding: 2px 4px; border-radius: 3px; white-space: nowrap; }
+        .breadcrumb-nav .bc-part:hover { background: #e3f2fd; }
+        .breadcrumb-nav .bc-part.bc-current { color: var(--secondary); text-decoration: none; font-weight: bold; cursor: default; }
+        .breadcrumb-nav .bc-part.bc-current:hover { background: transparent; }
+        .breadcrumb-nav .bc-sep { color: #999; font-size: 0.9rem; user-select: none; }
 
         /* Files Grid */
         .file-explorer { flex: 1; padding: 20px; overflow-y: auto; background: #ecf0f1; }
@@ -73,15 +80,17 @@
         #notepad-header { background: var(--secondary); padding: 10px 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
         
         /* Format Toolbar */
-        #format-toolbar { background: #f1f1f1; padding: 10px; border-bottom: 1px solid #ccc; display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+        #format-toolbar { background: #f1f1f1; padding: 8px 10px; border-bottom: 1px solid #ccc; display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
         
         /* Format Buttons & Active State */
         .format-btn { background: white; border: 1px solid #ccc; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold; min-width: 35px; color: #333; transition: 0.2s; }
         .format-btn:hover { background: #e9e9e9; }
-        
-        /* THIS IS THE ACTIVE COLOR CHANGE STYLE */
         .format-btn.active-tool { background: var(--primary); color: white; border-color: var(--primary-dark); }
         
+        /* Image Insert Button */
+        .format-btn-img { background: #8e44ad; border: 1px solid #7d3c98; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-weight: bold; color: white; transition: 0.2s; font-size: 0.85rem; }
+        .format-btn-img:hover { background: #7d3c98; }
+
         .divider { border-left: 1px solid #ccc; height: 20px; margin: 0 5px; }
 
         /* Auto Save Toggle */
@@ -105,8 +114,64 @@
         .code-header { background: #21252b; color: #ccc; padding: 5px 15px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; user-select: none; }
         .code-copy-btn { background: rgba(255,255,255,0.1); border: 1px solid #555; color: #fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; cursor: pointer; }
         .code-copy-btn:hover { background: rgba(255,255,255,0.2); }
+        .code-delete-btn { background: rgba(231,76,60,0.75); border: 1px solid #c0392b; color: #fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; cursor: pointer; margin-left: 4px; }
+        .code-delete-btn:hover { background: rgba(192,57,43,0.95); }
+        /* Host mode mein hi delete btn dikhe */
+        .host-only-code-del { display: none; }
+        body.is-host .host-only-code-del { display: inline-block; }
         pre.prettyprint { padding: 15px; color: var(--code-text); font-family: 'Consolas', 'Courier New', monospace; overflow-x: auto; white-space: pre; margin: 0; font-size: 0.95rem; min-height: 40px; }
         pre.prettyprint:focus { outline: 1px solid #555; background: #2c313a; }
+
+        /* --- NOTE IMAGE STYLES --- */
+        .note-image-wrapper {
+            display: block;
+            margin: 12px 0;
+            position: relative;
+        }
+        .note-image-wrapper img {
+            max-width: 100%;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: block;
+        }
+        .note-image-wrapper .img-remove-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(231,76,60,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .note-image-wrapper:hover .img-remove-btn { display: flex; }
+        .note-image-wrapper .img-caption { font-size: 0.85rem; color: #888; text-align: center; margin-top: 4px; }
+
+        /* --- IMAGE URL MODAL --- */
+        #img-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: none; align-items: center;
+            justify-content: center; z-index: 500;
+        }
+        #img-modal-overlay.open { display: flex; }
+        .img-modal-box {
+            background: white; padding: 28px; border-radius: 10px; width: 420px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+        .img-modal-box h3 { margin-bottom: 14px; color: var(--secondary); }
+        .img-modal-box input {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;
+            margin-bottom: 10px; font-size: 0.95rem;
+        }
+        #img-url-preview { max-width: 100%; max-height: 160px; border-radius: 5px; display: none; margin-bottom: 10px; border: 1px solid #eee; }
+        .img-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
 
         /* MODAL (Move) */
         #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 200; }
@@ -118,20 +183,35 @@
 
         /* Notification Toast */
         #toast { position: fixed; top: 20px; right: 20px; background: #333; color: white; padding: 10px 20px; border-radius: 4px; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 1000; }
+
+        /* Copy All Formatted Hint */
+        #copy-all-btn { position: relative; }
     </style>
 </head>
 <body>
 
     <div id="toast"></div>
 
+    <!-- IMAGE URL INSERT MODAL -->
+    <div id="img-modal-overlay">
+        <div class="img-modal-box">
+            <h3>🖼️ Image URL से Add करें</h3>
+            <input type="url" id="img-url-input" placeholder="https://example.com/image.jpg" oninput="previewImgUrl()" />
+            <img id="img-url-preview" alt="Preview" />
+            <p id="img-url-error" style="color:#e74c3c; font-size:0.85rem; display:none;">⚠️ Image load नहीं हो सकी। URL check करें।</p>
+            <div class="img-modal-actions">
+                <button class="btn btn-secondary" onclick="closeImgModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmInsertImage()">Insert Image</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MOVE FILE MODAL -->
     <div id="modal-overlay">
         <div class="modal-box">
             <h3>Move Item</h3>
             <p style="font-size: 0.8rem; color: #666">Select destination folder:</p>
-            <div class="folder-list" id="move-folder-list">
-                <!-- Javascript will populate this -->
-            </div>
+            <div class="folder-list" id="move-folder-list"></div>
             <div style="display:flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-secondary" onclick="closeMoveModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="confirmMove()">Move Here</button>
@@ -181,11 +261,11 @@
         <!-- Main Toolbar -->
         <div class="toolbar">
             <button class="btn btn-secondary" onclick="goUp()" id="btn-up" disabled>⬆ Up</button>
-            
-            <!-- File Search Input -->
             <input type="text" id="file-search" class="search-box" placeholder="🔍 Search Files..." onkeyup="filterFiles()">
-            
-            <div class="breadcrumb" id="breadcrumb-path">Home</div>
+            <!-- Full Breadcrumb Path -->
+            <div class="breadcrumb-nav" id="breadcrumb-path">
+                <span class="bc-part bc-current" onclick="goToFolder(null)">🏠 Home</span>
+            </div>
         </div>
 
         <!-- Admin Action Toolbar -->
@@ -195,10 +275,7 @@
             <button class="btn btn-warning" onclick="createItem('note')">+ Note</button>
             <div class="divider"></div>
             <button class="btn btn-secondary" id="btn-rename" onclick="renameItem()" disabled>Rename</button>
-            
-            <!-- Move Button -->
             <button class="btn btn-primary" id="btn-move" onclick="openMoveModal()" disabled>➡ Move</button>
-            
             <button class="btn btn-danger" id="btn-delete" onclick="deleteItem()" disabled>Delete</button>
         </div>
 
@@ -214,7 +291,6 @@
         <div id="notepad-header">
             <span id="note-filename">File.txt</span>
             <div style="display:flex; align-items:center;">
-                <!-- Auto Save Toggle -->
                 <div class="autosave-wrapper admin-tools hidden">
                     <span>Auto-Save</span>
                     <label class="switch">
@@ -222,8 +298,7 @@
                         <span class="slider"></span>
                     </label>
                 </div>
-
-                <button class="btn btn-secondary" style="font-size:0.8rem; margin-right:10px;" onclick="copyFullText()">📄 Copy All</button>
+                <button class="btn btn-secondary" id="copy-all-btn" style="font-size:0.8rem; margin-right:10px;" onclick="copyFullFormatted()">📄 Copy All</button>
                 <button class="btn btn-secondary" onclick="closeNote()">Close</button>
                 <button class="btn btn-success admin-tools hidden" id="btn-save" style="margin-left:5px;" onclick="saveNoteManual()">💾 Save</button>
             </div>
@@ -234,18 +309,17 @@
             <button class="format-btn" onclick="formatDoc('undo')" title="Undo">↩</button>
             <button class="format-btn" onclick="formatDoc('redo')" title="Redo">↪</button>
             <div class="divider"></div>
-            
-            <!-- Format Buttons (IDs added for coloring) -->
             <button id="tool-bold" class="format-btn" onclick="formatDoc('bold')" title="Ctrl+B"><b>B</b></button>
             <button id="tool-italic" class="format-btn" onclick="formatDoc('italic')" title="Ctrl+I"><i>I</i></button>
             <button id="tool-underline" class="format-btn" onclick="formatDoc('underline')" title="Ctrl+U"><u>U</u></button>
-            
             <div class="divider"></div>
             <button class="format-btn" onclick="formatDoc('insertUnorderedList')">• List</button>
-            <button class="format-btn" style="background:#333; color:white;" onclick="insertCodeBlock()"> &lt;/&gt; Code </button>
-            
+            <button class="format-btn" style="background:#333; color:white;" onclick="insertCodeBlock()">&lt;/&gt; Code</button>
+
+            <!-- IMAGE INSERT BUTTON -->
+            <button class="format-btn-img" onclick="openImgModal()" title="Image URL से Add करें">🖼️ Image</button>
+
             <div class="divider"></div>
-            <!-- Search Text in Editor -->
             <div style="display:flex; align-items:center; gap:5px;">
                 <input type="text" id="editor-search-box" placeholder="Find text..." style="padding:4px; width:100px; font-size:0.8rem;">
                 <button class="format-btn" onclick="searchTextInEditor()" title="Find">🔍</button>
@@ -295,41 +369,99 @@
             renderFiles();
         });
 
-        // ---------------- WINDOW EXPORTS (Functions called by HTML) ---------------- //
-        
-        // --- 1. SESSION ---
+        // ============================================================
+        // BREADCRUMB - Home से current folder तक पूरी hierarchy
+        // ============================================================
+        function buildBreadcrumb(folderId) {
+            const container = document.getElementById('breadcrumb-path');
+            container.innerHTML = '';
+
+            // Build path array from current folder back to root
+            const path = [];
+            let current = folderId;
+            while (current) {
+                const folder = files.find(f => f.id === current);
+                if (!folder) break;
+                path.unshift({ id: folder.id, name: folder.name });
+                current = folder.parent || null;
+            }
+
+            // Home part (always clickable unless we're at home)
+            const homeSpan = document.createElement('span');
+            homeSpan.className = 'bc-part' + (path.length === 0 ? ' bc-current' : '');
+            homeSpan.textContent = '🏠 Home';
+            if (path.length > 0) homeSpan.onclick = () => goToFolder(null);
+            container.appendChild(homeSpan);
+
+            // Each folder in path
+            path.forEach((part, idx) => {
+                const sep = document.createElement('span');
+                sep.className = 'bc-sep';
+                sep.textContent = ' › ';
+                container.appendChild(sep);
+
+                const span = document.createElement('span');
+                const isLast = idx === path.length - 1;
+                span.className = 'bc-part' + (isLast ? ' bc-current' : '');
+                span.textContent = '📁 ' + part.name;
+                if (!isLast) {
+                    const capturedId = part.id;
+                    span.onclick = () => goToFolder(capturedId);
+                }
+                container.appendChild(span);
+            });
+        }
+
+        // Navigate directly to any folder in breadcrumb
+        window.goToFolder = function(folderId) {
+            state.currentFolderId = folderId;
+            document.getElementById('file-search').value = '';
+            renderFiles();
+        };
+
+        // ============================================================
+        // SESSION
+        // ============================================================
         window.startSession = function(role) {
             state.role = role;
             document.getElementById('role-screen').classList.add('hidden');
             document.getElementById('dashboard-screen').classList.remove('hidden');
-            
             document.getElementById('role-badge').textContent = role === 'host' ? 'Admin' : 'View Only';
             document.querySelectorAll('.admin-tools').forEach(el => role === 'host' ? el.classList.remove('hidden') : el.classList.add('hidden'));
+            if(role === 'host') document.body.classList.add('is-host');
+            else document.body.classList.remove('is-host');
             renderFiles();
         };
 
-        window.showLogin = () => { document.getElementById('role-screen').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); };
+        window.showLogin = () => {
+            document.getElementById('role-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        };
         
         window.logout = function() {
             state = { role: 'user', currentFolderId: null, selectedId: null, openNoteId: null };
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById('role-screen').classList.remove('hidden');
+            document.body.classList.remove('is-host');
             closeNote();
             isAutoSaveOn = false;
         };
 
-        // --- 2. FILE NAV ---
+        // ============================================================
+        // FILE NAV
+        // ============================================================
         window.goUp = function() {
             if(state.currentFolderId) {
                 const cur = files.find(f => f.id === state.currentFolderId);
-                state.currentFolderId = cur ? cur.parent : null;
-                // Clear Search when navigating
+                state.currentFolderId = cur ? (cur.parent || null) : null;
                 document.getElementById('file-search').value = '';
                 renderFiles();
             }
         };
 
-        // --- 3. CRUD ---
+        // ============================================================
+        // CRUD
+        // ============================================================
         window.createItem = function(type) {
             const name = document.getElementById('new-name').value.trim() || (type==='folder'?'New Folder':'New Note');
             push(filesRef, {
@@ -352,14 +484,13 @@
             if(!state.selectedId || !confirm("Delete Permanently?")) return;
             const updates = {};
             updates['files/' + state.selectedId] = null;
-            // Recursively delete children (client side simplified)
             const getChildren = (pid) => files.filter(f => f.parent === pid);
             const collectDeletes = (pid) => {
                 getChildren(pid).forEach(c => {
                     updates['files/' + c.id] = null;
                     collectDeletes(c.id);
                 });
-            }
+            };
             collectDeletes(state.selectedId);
             update(ref(db), updates).then(() => showToast("Deleted"));
         };
@@ -379,16 +510,15 @@
             }
         };
 
-        // --- 4. MOVE FUNCTIONALITY ---
+        // ============================================================
+        // MOVE FUNCTIONALITY
+        // ============================================================
         window.openMoveModal = function() {
             if(!state.selectedId) return;
             const fileToMove = files.find(f => f.id === state.selectedId);
-            
-            // Generate list of folder candidates
             const listContainer = document.getElementById('move-folder-list');
             listContainer.innerHTML = `<div class="folder-item active" onclick="selectMoveTarget(null, this)">🏠 Root (Home)</div>`;
             
-            // Helper to check for loops (cannot move folder into its own child)
             const isDescendant = (childId, parentId) => {
                if(!childId) return false;
                if(childId === parentId) return true;
@@ -397,11 +527,8 @@
             };
 
             const allFolders = files.filter(f => f.type === 'folder' && f.id !== state.selectedId);
-
             allFolders.forEach(folder => {
-                // If moving a folder, ensure we don't move into its own child
                 if(fileToMove.type === 'folder' && isDescendant(folder.id, fileToMove.id)) return;
-                
                 const el = document.createElement('div');
                 el.className = 'folder-item';
                 el.innerHTML = `📁 ${folder.name}`;
@@ -429,19 +556,23 @@
 
         window.closeMoveModal = () => document.getElementById('modal-overlay').style.display = 'none';
 
-
-        // --- 5. NOTE LOGIC ---
+        // ============================================================
+        // NOTE LOGIC
+        // ============================================================
         window.openNote = function(id) {
             const file = files.find(f => f.id === id);
             if(!file) return;
-
             state.openNoteId = id;
             const editor = document.getElementById('note-editor');
             document.getElementById('note-filename').textContent = file.name;
             document.getElementById('notepad-overlay').classList.add('active');
-            
             editor.innerHTML = file.content || "";
-            
+
+            // Restore remove-btn visibility logic for images
+            editor.querySelectorAll('.img-remove-btn').forEach(btn => {
+                if(state.role !== 'host') btn.style.display = 'none';
+            });
+
             if(state.role === 'host') {
                 editor.setAttribute('contenteditable', 'true');
                 editor.focus();
@@ -468,7 +599,9 @@
             state.openNoteId = null;
         };
 
-        // --- 6. AUTO SAVE ---
+        // ============================================================
+        // AUTO SAVE
+        // ============================================================
         const autoSaveCheckbox = document.getElementById('autosave-toggle');
         const editor = document.getElementById('note-editor');
 
@@ -484,8 +617,9 @@
             }
         });
 
-        // --- 7. FORMATTING & TOOL COLORS & SHORTCUTS ---
-        
+        // ============================================================
+        // FORMATTING & SHORTCUTS
+        // ============================================================
         window.formatDoc = function(cmd) {
             document.execCommand(cmd, false, null);
             editor.focus();
@@ -501,14 +635,9 @@
                 const bold = document.queryCommandState('bold');
                 const italic = document.queryCommandState('italic');
                 const underline = document.queryCommandState('underline');
-                
-                const btnBold = document.getElementById('tool-bold');
-                const btnItalic = document.getElementById('tool-italic');
-                const btnUnder = document.getElementById('tool-underline');
-
-                if(bold) btnBold.classList.add('active-tool'); else btnBold.classList.remove('active-tool');
-                if(italic) btnItalic.classList.add('active-tool'); else btnItalic.classList.remove('active-tool');
-                if(underline) btnUnder.classList.add('active-tool'); else btnUnder.classList.remove('active-tool');
+                document.getElementById('tool-bold').classList.toggle('active-tool', bold);
+                document.getElementById('tool-italic').classList.toggle('active-tool', italic);
+                document.getElementById('tool-underline').classList.toggle('active-tool', underline);
             } catch(e) {}
         }
 
@@ -528,14 +657,14 @@
                 document.designMode = "on";
                 const sel = window.getSelection();
                 sel.collapse(document.body, 0);
-                if(!window.find(txt)) {
-                    showToast("Text not found");
-                }
+                if(!window.find(txt)) showToast("Text not found");
                 document.designMode = "off";
             }
         };
 
-        // --- 8. FILE SEARCH ---
+        // ============================================================
+        // FILE SEARCH & RENDER
+        // ============================================================
         window.filterFiles = function() {
             const term = document.getElementById('file-search').value.toLowerCase();
             const grid = document.getElementById('file-grid');
@@ -544,12 +673,14 @@
             let list = [];
             
             if(term.length > 0) {
-                document.getElementById('breadcrumb-path').textContent = "Search Results: " + term;
+                // Search mode - show all matching files globally
+                buildBreadcrumb(null); // reset breadcrumb
+                const searchLabel = document.getElementById('breadcrumb-path');
+                searchLabel.innerHTML = `<span style="color:#e67e22; font-weight:bold;">🔍 Search: "${term}"</span>`;
                 document.getElementById('btn-up').disabled = false;
                 list = files.filter(f => f.name.toLowerCase().includes(term));
             } else {
-                const curName = state.currentFolderId ? (files.find(f=>f.id===state.currentFolderId)?.name || 'Home') : 'Home';
-                document.getElementById('breadcrumb-path').textContent = curName;
+                buildBreadcrumb(state.currentFolderId);
                 document.getElementById('btn-up').disabled = !state.currentFolderId;
                 list = files.filter(f => {
                     if(state.currentFolderId === null) return !f.parent;
@@ -557,13 +688,15 @@
                 });
             }
 
-            if(list.length === 0) grid.innerHTML = '<p style="color:#888;">No items found</p>';
+            if(list.length === 0) {
+                grid.innerHTML = '<p style="color:#888; grid-column:1/-1;">No items found</p>';
+            }
 
             list.forEach(f => {
                 const el = document.createElement('div');
                 el.className = 'item';
                 el.innerHTML = `
-                    <span class="item-icon">${f.type === 'folder'?'📁':'📝'}</span>
+                    <span class="item-icon">${f.type === 'folder' ? '📁' : '📝'}</span>
                     <span>${f.name.replace(/</g, "&lt;")}</span>
                 `;
                 el.onclick = (e) => { e.stopPropagation(); selectItem(f.id, el); };
@@ -583,7 +716,7 @@
         function renderFiles() { window.filterFiles(); }
         
         function updateButtons() {
-            if(state.role==='host') {
+            if(state.role === 'host') {
                 const on = !!state.selectedId;
                 document.getElementById('btn-rename').disabled = !on;
                 document.getElementById('btn-delete').disabled = !on;
@@ -591,40 +724,166 @@
             }
         }
 
-        // --- UTILS ---
+        // ============================================================
+        // CODE BLOCK
+        // ============================================================
         window.insertCodeBlock = function() {
             if(state.role !== 'host') return;
             const id = 'c' + Date.now();
+            const wrapperId = 'cw' + Date.now();
             const html = `
-                <div class="code-container" contenteditable="false">
+                <div class="code-container" id="${wrapperId}" contenteditable="false">
                     <div class="code-header">
                         <span>Snippet</span>
-                        <button class="code-copy-btn" onclick="copySnippet('${id}')">Copy</button>
+                        <div>
+                            <button class="code-copy-btn" onclick="copySnippet('${id}')">Copy</button>
+                            <button class="code-delete-btn host-only-code-del" onclick="removeCodeBlock('${wrapperId}')" title="Delete Code Block">🗑 Delete</button>
+                        </div>
                     </div>
-                    <pre id="${id}" class="prettyprint" contenteditable="true">Code...</pre>
+                    <pre id="${id}" class="prettyprint" contenteditable="true"></pre>
                 </div><p><br></p>`;
             document.execCommand('insertHTML', false, html);
         };
 
         window.copySnippet = function(id) {
             const el = document.getElementById(id);
-            if(el) {
-                navigator.clipboard.writeText(el.innerText)
-                .then(()=>showToast("Code Copied!"))
-                .catch(()=>showToast("Err copying"));
+            if(el) navigator.clipboard.writeText(el.innerText).then(() => showToast("Code Copied!")).catch(() => showToast("Err copying"));
+        };
+
+        window.removeCodeBlock = function(wrapperId) {
+            if(state.role !== 'host') return;
+            const el = document.getElementById(wrapperId);
+            if(el && confirm("Code block delete karein?")) {
+                el.remove();
+                saveNoteData(false);
+                showToast("Code block removed");
             }
         };
 
-        window.copyFullText = function() {
-            navigator.clipboard.writeText(document.getElementById('note-editor').innerText)
-            .then(()=>showToast("Note Copied!"));
+        // ============================================================
+        // COPY ALL - पूरे HTML format के साथ
+        // Paste करने पर किसी भी browser में format बना रहेगा
+        // ============================================================
+        window.copyFullFormatted = function() {
+            const editorEl = document.getElementById('note-editor');
+            
+            // We build a full self-contained HTML blob so it pastes with format
+            const htmlContent = editorEl.innerHTML;
+
+            // Inline styles for copied content so it renders everywhere
+            const styledHtml = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+  body { font-family: 'Segoe UI', sans-serif; font-size: 1.1rem; line-height: 1.6; padding: 20px; color: #222; max-width: 900px; margin: 0 auto; }
+  b, strong { font-weight: bold; }
+  i, em { font-style: italic; }
+  u { text-decoration: underline; }
+  ul { margin-left: 20px; }
+  .code-container { margin: 15px 0; background: #282c34; border-radius: 6px; overflow: hidden; }
+  .code-header { background: #21252b; color: #ccc; padding: 5px 15px; font-size: 0.85rem; display: flex; justify-content: space-between; }
+  pre { padding: 15px; color: #abb2bf; font-family: 'Consolas', 'Courier New', monospace; white-space: pre-wrap; margin: 0; font-size: 0.95rem; }
+  .note-image-wrapper { display: block; margin: 12px 0; }
+  .note-image-wrapper img { max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .img-caption { font-size: 0.85rem; color: #888; text-align: center; margin-top: 4px; }
+  .img-remove-btn { display: none !important; }
+  .code-copy-btn { display: none; }
+</style>
+</head><body>${htmlContent}</body></html>`;
+
+            // Use Clipboard API with both text/html and text/plain
+            const plainText = editorEl.innerText;
+
+            try {
+                const htmlBlob = new Blob([styledHtml], { type: 'text/html' });
+                const textBlob = new Blob([plainText], { type: 'text/plain' });
+                const clipItem = new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': textBlob });
+                navigator.clipboard.write([clipItem])
+                    .then(() => showToast("✅ Formatted Copy Done! (Paste anywhere with format)"))
+                    .catch(() => {
+                        // Fallback: copy HTML source
+                        navigator.clipboard.writeText(styledHtml).then(() => showToast("✅ HTML Copied! Paste in .html file"));
+                    });
+            } catch(err) {
+                navigator.clipboard.writeText(styledHtml).then(() => showToast("✅ HTML source copied!"));
+            }
         };
 
+        // ============================================================
+        // IMAGE URL INSERT
+        // ============================================================
+        let _savedSelection = null;
+
+        window.openImgModal = function() {
+            if(state.role !== 'host') return;
+            // Cursor position save करो
+            const sel = window.getSelection();
+            if(sel && sel.rangeCount > 0) _savedSelection = sel.getRangeAt(0).cloneRange();
+
+            document.getElementById('img-url-input').value = '';
+            document.getElementById('img-url-preview').style.display = 'none';
+            document.getElementById('img-url-error').style.display = 'none';
+            document.getElementById('img-modal-overlay').classList.add('open');
+        };
+
+        window.closeImgModal = function() {
+            document.getElementById('img-modal-overlay').classList.remove('open');
+        };
+
+        window.previewImgUrl = function() {
+            const url = document.getElementById('img-url-input').value.trim();
+            const preview = document.getElementById('img-url-preview');
+            const errMsg = document.getElementById('img-url-error');
+            if(!url) { preview.style.display = 'none'; errMsg.style.display = 'none'; return; }
+            preview.src = url;
+            preview.style.display = 'block';
+            preview.onerror = () => {
+                preview.style.display = 'none';
+                errMsg.style.display = 'block';
+            };
+            preview.onload = () => { errMsg.style.display = 'none'; };
+        };
+
+        window.confirmInsertImage = function() {
+            const url = document.getElementById('img-url-input').value.trim();
+            if(!url) { showToast("URL डालें"); return; }
+
+            closeImgModal();
+
+            // Cursor restore
+            if(_savedSelection) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(_savedSelection);
+            }
+
+            // Unique id for remove button
+            const uid = 'img_' + Date.now();
+
+            // Image block HTML - self contained, works on paste too
+            const imgHtml = `<div class="note-image-wrapper" id="${uid}" contenteditable="false">
+  <img src="${url}" alt="Image" onerror="this.parentElement.querySelector('.img-caption').textContent='⚠️ Image load नहीं हुई';" />
+  <button class="img-remove-btn" onclick="removeNoteImage('${uid}')" title="Remove Image">✕</button>
+  <div class="img-caption" contenteditable="true" style="outline:none;" placeholder="Caption (optional)..."></div>
+</div><p><br></p>`;
+
+            document.execCommand('insertHTML', false, imgHtml);
+            editor.focus();
+            showToast("🖼️ Image Added!");
+        };
+
+        window.removeNoteImage = function(uid) {
+            const el = document.getElementById(uid);
+            if(el && confirm("Image हटाएं?")) { el.remove(); saveNoteData(false); showToast("Image removed"); }
+        };
+
+        // ============================================================
+        // UTILS
+        // ============================================================
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.textContent = msg;
             t.style.opacity = 1;
-            setTimeout(()=>t.style.opacity=0, 2500);
+            setTimeout(() => t.style.opacity = 0, 2500);
         }
 
         // Login Handler
@@ -632,7 +891,7 @@
             e.preventDefault();
             const u = document.getElementById('login-id').value;
             const p = document.getElementById('login-pass').value;
-            if(u===CREDENTIALS.id && p===CREDENTIALS.pass) {
+            if(u === CREDENTIALS.id && p === CREDENTIALS.pass) {
                 document.getElementById('login-screen').classList.add('hidden');
                 startSession('host');
                 showToast("Access Granted");
